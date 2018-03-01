@@ -2,10 +2,18 @@
 
 Mapping between Human Phenotype Ontology (HPO) and Gene Ontology (GO) terms for the prediction of gene/protein - function - phenotype - disease associations.
 
-## Title and Abstract
+## Title, Author Info and Abstract
 
 HPO2GO: Prediction of Human Phenotype Ontology Term Associations with Cross Ontology Annotation Co-occurrences
 
+Tunca Doğan1,2,3,*
+
+1	Cancer Systems Biology Laboratory (CanSyL), Graduate School of Informatics, METU, Ankara, 06800, Turkey
+2	Department of Health Informatics, Graduate School of Informatics, METU, Ankara, 06800, Turkey
+3	European Molecular Biology Laboratory, European Bioinformatics Institute (EMBL-EBI), Hinxton, Cambridge, CB10 1SD, UK
+* corresponding author email address: tdogan@metu.edu.tr
+
+ABSTRACT
 Analysing the relations between diseases with genetic origin and biomolecules is a highly active area of research, where the aim is to identify the genes and gene products that cause a particular disease due to functional changes originated from mutations. Biological ontologies are frequently employed for this purpose. The Gene Ontology (GO) systematically defines the functions of genes/proteins using uniquely defined terms. Another system, the Human Phenotype Ontology (HPO) defines the phenotypic abnormalities with a controlled vocabulary that maps to disease entries in data resources such as OMIM and Orphanet. The employment of ontologies provided researchers with opportunities for knowledge discovery through computational data analysis, which significantly advanced the field.
 
 In this study, a novel approach is proposed for the identification of relations between biomedical entities by semantically mapping phenotypic abnormality defining HPO terms with biomolecular function defining GO terms, where each association indicates the occurrence of the abnormality due to the loss of the biomolecular function expressed by the corresponding GO term. The proposed HPO2GO mappings were extracted by calculating the frequency of the co-annotations of the terms on the same genes/proteins, using already existing curated HPO and GO annotation sets. This was followed by the filtering of the unreliable mappings that could be observed due to chance by statistical resampling of the co-occurrence similarity distributions using the Kolmogorov-Smirnov (KS) statistic. Furthermore, biological relevance of the finalized mappings were discussed over selected cases, using the literature based information.
