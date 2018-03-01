@@ -14,7 +14,7 @@ Tunca Doğan1,2,3,*
 
 3	European Molecular Biology Laboratory, European Bioinformatics Institute (EMBL-EBI), Hinxton, Cambridge, CB10 1SD, UK
 
- * corresponding author email addresses: tdogan@metu.edu.tr, tdogan@ebi.ac.uk
+	* corresponding author email addresses: tdogan@metu.edu.tr, tdogan@ebi.ac.uk
 
 ABSTRACT
 
