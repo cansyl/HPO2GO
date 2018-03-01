@@ -14,7 +14,8 @@ Tunca Doğan1,2,3,+
 
 3	European Molecular Biology Laboratory, European Bioinformatics Institute (EMBL-EBI), Hinxton, Cambridge, CB10 1SD, UK
 
-corresponding author email addresses: tdogan@metu.edu.tr, tdogan@ebi.ac.uk
+* 
+* corresponding author email addresses: tdogan@metu.edu.tr, tdogan@ebi.ac.uk
 
 ABSTRACT
 Analysing the relations between diseases with genetic origin and biomolecules is a highly active area of research, where the aim is to identify the genes and gene products that cause a particular disease due to functional changes originated from mutations. Biological ontologies are frequently employed for this purpose. The Gene Ontology (GO) systematically defines the functions of genes/proteins using uniquely defined terms. Another system, the Human Phenotype Ontology (HPO) defines the phenotypic abnormalities with a controlled vocabulary that maps to disease entries in data resources such as OMIM and Orphanet. The employment of ontologies provided researchers with opportunities for knowledge discovery through computational data analysis, which significantly advanced the field.
