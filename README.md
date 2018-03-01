@@ -6,13 +6,15 @@ Mapping between Human Phenotype Ontology (HPO) and Gene Ontology (GO) terms for 
 
 HPO2GO: Prediction of Human Phenotype Ontology Term Associations with Cross Ontology Annotation Co-occurrences
 
-Tunca Doğan1,2,3,*
+Tunca Doğan1,2,3,+
 
 1	Cancer Systems Biology Laboratory (CanSyL), Graduate School of Informatics, METU, Ankara, 06800, Turkey
+
 2	Department of Health Informatics, Graduate School of Informatics, METU, Ankara, 06800, Turkey
+
 3	European Molecular Biology Laboratory, European Bioinformatics Institute (EMBL-EBI), Hinxton, Cambridge, CB10 1SD, UK
 
-* corresponding author email address: tdogan@metu.edu.tr
++ corresponding author email addresses: tdogan@metu.edu.tr, tdogan@ebi.ac.uk
 
 ABSTRACT
 Analysing the relations between diseases with genetic origin and biomolecules is a highly active area of research, where the aim is to identify the genes and gene products that cause a particular disease due to functional changes originated from mutations. Biological ontologies are frequently employed for this purpose. The Gene Ontology (GO) systematically defines the functions of genes/proteins using uniquely defined terms. Another system, the Human Phenotype Ontology (HPO) defines the phenotypic abnormalities with a controlled vocabulary that maps to disease entries in data resources such as OMIM and Orphanet. The employment of ontologies provided researchers with opportunities for knowledge discovery through computational data analysis, which significantly advanced the field.
