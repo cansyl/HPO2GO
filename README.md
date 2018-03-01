@@ -14,10 +14,10 @@ Tunca Doğan1,2,3,+
 
 3	European Molecular Biology Laboratory, European Bioinformatics Institute (EMBL-EBI), Hinxton, Cambridge, CB10 1SD, UK
 
-* 
-* corresponding author email addresses: tdogan@metu.edu.tr, tdogan@ebi.ac.uk
+/* corresponding author email addresses: tdogan@metu.edu.tr, tdogan@ebi.ac.uk
 
 ABSTRACT
+
 Analysing the relations between diseases with genetic origin and biomolecules is a highly active area of research, where the aim is to identify the genes and gene products that cause a particular disease due to functional changes originated from mutations. Biological ontologies are frequently employed for this purpose. The Gene Ontology (GO) systematically defines the functions of genes/proteins using uniquely defined terms. Another system, the Human Phenotype Ontology (HPO) defines the phenotypic abnormalities with a controlled vocabulary that maps to disease entries in data resources such as OMIM and Orphanet. The employment of ontologies provided researchers with opportunities for knowledge discovery through computational data analysis, which significantly advanced the field.
 
 In this study, a novel approach is proposed for the identification of relations between biomedical entities by semantically mapping phenotypic abnormality defining HPO terms with biomolecular function defining GO terms, where each association indicates the occurrence of the abnormality due to the loss of the biomolecular function expressed by the corresponding GO term. The proposed HPO2GO mappings were extracted by calculating the frequency of the co-annotations of the terms on the same genes/proteins, using already existing curated HPO and GO annotation sets. This was followed by the filtering of the unreliable mappings that could be observed due to chance by statistical resampling of the co-occurrence similarity distributions using the Kolmogorov-Smirnov (KS) statistic. Furthermore, biological relevance of the finalized mappings were discussed over selected cases, using the literature based information.
