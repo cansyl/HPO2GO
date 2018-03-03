@@ -4,7 +4,7 @@ Mapping between Human Phenotype Ontology (HPO) and Gene Ontology (GO) terms for 
 
 ## Title, Author Info and Abstract
 
-HPO2GO: Prediction of Human Phenotype Ontology Term Associations with Cross Ontology Annotation Co-occurrences
+HPO2GO: Prediction of Human Phenotype Ontology Term Associations Using Cross Ontology Annotation Co-occurrences
 
 Tunca Doğan1,2,3,*
 
