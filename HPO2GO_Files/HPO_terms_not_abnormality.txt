@@ -1,0 +1,124 @@
+HP:0001522	Death in infancy
+HP:0001699	Sudden death
+HP:0003811	Neonatal death
+HP:0003819	Death in childhood
+HP:0003826	Stillbirth
+HP:0011420	Age of death
+HP:0011421	Death in adolescence
+HP:0100613	Death in early adulthood
+HP:0003812	Phenotypic variability
+HP:0003828	Variable expressivity
+HP:0003829	Incomplete penetrance
+HP:0003831	Age-dependent penetrance
+HP:0012824	Severity
+HP:0012825	Mild
+HP:0012826	Moderate
+HP:0012827	Borderline
+HP:0012828	Severe
+HP:0012829	Profound
+HP:0012830	Position
+HP:0012831	Laterality
+HP:0012832	Bilateral
+HP:0012833	Unilateral
+HP:0012834	Right
+HP:0012835	Left
+HP:0012836	Spatial pattern
+HP:0012837	Generalized
+HP:0012838	Localized
+HP:0012839	Distal
+HP:0012840	Proximal
+HP:0020034	Diffuse
+HP:0025204	Triggered by
+HP:0025205	Triggered by breast feeding
+HP:0025206	Triggered by cold
+HP:0025207	Triggered by dehydration
+HP:0025208	Triggered by carbohydrate ingestion
+HP:0025209	Triggered by fructose ingestion
+HP:0025210	Triggered by glucose ingestion
+HP:0025211	Triggered by ethanol ingestion
+HP:0025212	Triggered by fasting
+HP:0025213	Triggered by galactose ingestion
+HP:0025214	Triggered by heat
+HP:0025215	Triggered by febrile illness
+HP:0025216	Triggered by heavy meal
+HP:0025217	Triggered by high-fat diet
+HP:0025218	Triggered by hyperventilation
+HP:0025219	Triggered by vaccination
+HP:0025220	Triggered by menstruation
+HP:0025221	Triggered by pregnancy
+HP:0025222	Triggered by sleep deprivation
+HP:0025223	Triggered by smoking
+HP:0025224	Triggered by sodium ingestion
+HP:0025225	Triggered by sound
+HP:0025226	Triggered by stress
+HP:0025227	Triggered by excitement
+HP:0025228	Triggered by sudden movement
+HP:0025229	Triggered by vestibular stimulation
+HP:0025254	Ameliorated by
+HP:0025255	Ameliorated by pregnancy
+HP:0025256	Ameliorated by heat
+HP:0025257	Ameliorated by carbohydrate ingestion
+HP:0025275	Lateral
+HP:0025280	Pain characteristic
+HP:0025281	Sharp
+HP:0025282	Dull
+HP:0025283	Tender
+HP:0025284	Sleep-interrupting
+HP:0025285	Aggravated by
+HP:0025286	Aggravated by activity
+HP:0025287	Axial
+HP:0025290	Upper-body predominance
+HP:0025291	Lower-body predominance
+HP:0025292	Acral
+HP:0025293	Distributed along Blashko lines
+HP:0025294	Dermatomal
+HP:0025295	Herpetiform
+HP:0025296	Morbilliform
+HP:0025315	Exacerbated by head trauma
+HP:0025334	Triggered by emotion
+HP:0025377	Triggered by exertion
+HP:0030645	Central
+HP:0030646	Peripheral
+HP:0030647	Paracentral
+HP:0030648	Midperipheral
+HP:0030649	Pericentral
+HP:0030650	Focal
+HP:0030651	Multifocal
+HP:0031135	Triggered by physical trauma
+HP:0031167	Triggered by ingestion of potassium-rich food
+HP:0031375	Refractory
+HP:0031450	Polycyclic
+HP:0040280	Obligate
+HP:0040281	Very frequent
+HP:0040282	Frequent
+HP:0040283	Occasional
+HP:0040284	Very rare
+HP:0040285	Excluded
+HP:0000006	Autosomal dominant inheritance
+HP:0000007	Autosomal recessive inheritance
+HP:0001417	X-linked inheritance
+HP:0001419	X-linked recessive inheritance
+HP:0001423	X-linked dominant inheritance
+HP:0001425	Heterogeneous
+HP:0001426	Multifactorial inheritance
+HP:0001427	Mitochondrial inheritance
+HP:0001428	Somatic mutation
+HP:0001442	Somatic mosaicism
+HP:0001444	Autosomal dominant somatic cell mutation
+HP:0001450	Y-linked inheritance
+HP:0001452	Autosomal dominant contiguous gene syndrome
+HP:0001466	Contiguous gene syndrome
+HP:0001470	Sex-limited autosomal dominant
+HP:0001472	Familial predisposition
+HP:0001475	Male-limited autosomal dominant
+HP:0003743	Genetic anticipation
+HP:0003744	Genetic anticipation with paternal anticipation bias
+HP:0003745	Sporadic
+HP:0010982	Polygenic inheritance
+HP:0010983	Oligogenic inheritance
+HP:0010984	Digenic inheritance
+HP:0010985	Gonosomal inheritance
+HP:0012274	Autosomal dominant inheritance with paternal imprinting
+HP:0012275	Autosomal dominant inheritance with maternal imprinting
+HP:0025352	Autosomal dominant germline de novo mutation
+HP:0031362	Sex-limited autosomal recessive inheritance

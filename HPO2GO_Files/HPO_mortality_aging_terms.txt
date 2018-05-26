@@ -1,0 +1,8 @@
+HP:0001522	Death in infancy
+HP:0001699	Sudden death
+HP:0003811	Neonatal death
+HP:0003819	Death in childhood
+HP:0003826	Stillbirth
+HP:0011420	Age of death
+HP:0011421	Death in adolescence
+HP:0100613	Death in early adulthood

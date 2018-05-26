@@ -1,0 +1,6 @@
+HP:0040280	Obligate
+HP:0040281	Very frequent
+HP:0040282	Frequent
+HP:0040283	Occasional
+HP:0040284	Very rare
+HP:0040285	Excluded
