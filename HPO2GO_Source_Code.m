@@ -1,4 +1,4 @@
-% HPO2GO v1.0
+% HPO2GO v1.1
 %
 % Mapping between Human Phenotype Ontology (HPO) and Gene Ontology (GO)
 % terms for the prediction of gene/protein - function - phenotype - disease
@@ -660,10 +660,16 @@ save HPO2GO_Files/HPO_CAFA2_training_variables.mat CAFA2_HPO_training_UniProtid 
 
 CAFA2_HPO_training_annot_genesymbol_unique=unique(CAFA2_HPO_training_annot_genesymbol_HPOid_unique(:,1));
 
-[~,GO_UniProt_acc_all,GO_gene_symbol_all,~,GO_term_id_all,GO_term_name_all,GO_term_aspect_all,~,~,~,~,~,~]=textread('GOA_UniProt_human_protein_annotation_2014_01.tsv', '%s %s %s %s %s %s %s %s %s %s %s %s %s', 'delimiter', '\t','headerlines',1);
+[GO_UniProt_acc_all,GO_gene_symbol_all,GO_term_id_all,GO_term_evid_all]=textread('HPO2GO_Files/GOA_UniProt_human_protein_annotation_2014_01.txt', '%s %s %s %s', 'delimiter', '\t');
+ind_IEA=find(strcmp(GO_term_evid_all,'IEA')==1);
 GO_annot_manual_human_all=[GO_gene_symbol_all GO_term_id_all];
+GO_annot_manual_human_all(ind_IEA,:)=[];
 GO_annot_manual_human_all=uniqueRowsCA(GO_annot_manual_human_all);
-save HPO2GO_Files/CAFA2_HPO_test_GO_annotation_all.mat GO_annot_manual_human_all -v7
+save HPO2GO_Files/HPO_test_GO_annotation_all.mat GO_annot_manual_human_all -v7
+GO_annot_manual_human_all_addcol=[GO_gene_symbol_all GO_term_id_all GO_term_evid_all];
+GO_annot_manual_human_all_addcol(ind_IEA,:)=[];
+GO_annot_manual_human_all_addcol=uniqueRowsCA(GO_annot_manual_human_all_addcol);
+save HPO2GO_Files/HPO_test_GO_annotation_all_addcol.mat GO_annot_manual_human_all_addcol -v7
 
 [Lia,Locb]=ismember(GO_annot_manual_human_all(:,1),CAFA2_HPO_training_annot_genesymbol_unique);
 CAFA2_GO_annot_manual_human=GO_annot_manual_human_all(Lia==1,:);
@@ -791,38 +797,349 @@ CAFA2_HPO_predictions_CAFAid_genesymbol_HPOid_sco(:,2:4)=CAFA2_HPO_predictions;
 save HPO2GO_Files/CAFA2_HPO_predictions_CAFAid_genesymbol_HPOid_sco.mat CAFA2_HPO_predictions_CAFAid_genesymbol_HPOid_sco -v7
 CAFA2_pred_eval_save=CAFA2_HPO_predictions_CAFAid_genesymbol_HPOid_sco;
 CAFA2_pred_eval_save(cellfun(@isempty,CAFA2_pred_eval_save(:,1))==1,:)=[];
-dlmcell('CAFA2_HPO_target_predictions.txt',CAFA2_pred_eval_save(:,[1 3 4]))
+
+CAFA2_pred_eval_save134=CAFA2_pred_eval_save(:,[1 3 4]);
+CAFA2_pred_eval_save_txt=CAFA2_pred_eval_save134';
+fid=fopen('HPO2GO_Files/CAFA2_HPO_target_predictions.txt', 'w');
+fprintf(fid, '%s\t%s\t%.4f\n', CAFA2_pred_eval_save_txt{:});
+fclose(fid);
+
 CAFA2_HPO_target_predictions=CAFA2_pred_eval_save(:,[1 3 4]);
 save HPO2GO_Files/CAFA2_HPO_target_predictions.mat CAFA2_HPO_target_predictions -v7
+
+
+
+% Performance test on CAFA2 targets using propagated HPO annotations and GO annotation with all evidence codes (HPOprop2GOall)
+
+% Propagating the HPO annotations to the root:
+
+[CAFA2_HPO_training_UniProtid,CAFA2_HPO_training_HPOid]=textread('CAFA2/CAFA2_Supplementary_data/data/HPO-t0/hpoa.hp', '%s %s', 'delimiter', '\t');
+CAFA2_HPO_training=[CAFA2_HPO_training_UniProtid CAFA2_HPO_training_HPOid];
+CAFA2_HPO_training_unique=uniqueRowsCA(CAFA2_HPO_training);
+CAFA2_HPO_training_UniProtid_unique=unique(CAFA2_HPO_training_UniProtid);
+CAFA2_HPO_training_HPOid_unique=unique(CAFA2_HPO_training_HPOid);
+ont=pfp_ontbuild('CAFA2/CAFA2-master/ontology/hpo_v810-17-SEP-2013.obo');
+term_list=cellstr(vertcat(ont.term.id));
+[Lia,Locb]=ismember(CAFA2_HPO_training_HPOid,term_list);
+[Lia2,Locb2]=ismember(CAFA2_HPO_training_UniProtid,CAFA2_HPO_training_UniProtid_unique);
+source_annot_mat=zeros(length(CAFA2_HPO_training_UniProtid_unique),length(term_list));
+row_nonz=Locb2(Locb>0);
+col_nonz=Locb(Locb>0);
+for i=1:length(row_nonz);
+    disp(['Ind: ', num2str(i), ' / ', num2str(length(row_nonz))])
+    source_annot_mat(row_nonz(i,1),col_nonz(i,1))=1;
+end
+source_annot_mat_log=logical(source_annot_mat);
+A=pfp_annotprop(ont.DAG, source_annot_mat_log);
+[A_ind_row,A_ind_col]=find(A==1);
+CAFA2_HPO_training_prop=CAFA2_HPO_training_UniProtid_unique(A_ind_row,1);
+CAFA2_HPO_training_prop(:,2)=term_list(A_ind_col,1);
+CAFA2_HPO_training_prop(strcmp(CAFA2_HPO_training_prop(:,2),'HP:0000001')==1,:)=[];
+CAFA2_HPO_training_propagated=vertcat(CAFA2_HPO_training_prop,CAFA2_HPO_training);
+CAFA2_HPO_training_propagated=uniqueRowsCA(CAFA2_HPO_training_propagated);
+CAFA2_HPO_training_propagated_unique=unique(CAFA2_HPO_training_propagated(:,1));
+% (download the uniprot acc, entry name, gene symbol for the proteins in 'CAFA2_HPO_training_propagated_unique' as gene_list.txt)
+[CAFA2_HPO_training_propagated_unique_UniProtID,CAFA2_HPO_training_propagated_unique_entry_name,CAFA2_HPO_training_propagated_unique_genesymbol]=textread('gene_list.txt', '%s %s %s', 'delimiter', '\t', 'headerlines', 1);
+[Lia,Locb]=ismember(CAFA2_HPO_training_propagated(:,1),CAFA2_HPO_training_propagated_unique_UniProtID);
+CAFA2_HPO_training_propagated=CAFA2_HPO_training_propagated(Lia==1,:);
+CAFA2_HPO_training_propagated(:,3)=CAFA2_HPO_training_propagated_unique_genesymbol(Locb(Lia==1,1),1);
+save HPO2GO_Files/CAFA2_HPO_training_propagated.mat CAFA2_HPO_training_propagated -v7
+
+CAFA2_HPO_training_propagated_txt=CAFA2_HPO_training_propagated';
+fid=fopen('HPO2GO_Files/CAFA2_HPO_training_propagated.txt', 'w');
+fprintf(fid, '%s\t%s\t%s\n', CAFA2_HPO_training_propagated_txt{:});
+fclose(fid);
+
+% Generating the GO annotation arrays:
+
+load HPO2GO_Files/CAFA2_HPO_training_propagated.mat
+load HPO2GO_Files/CAFA2_Targets_human_all_mappings.mat
+
+[GO_UniProt_acc_all,GO_gene_symbol_all,GO_term_id_all,GO_term_evid_all]=textread('HPO2GO_Files/GOA_UniProt_human_protein_annotation_2014_01.txt', '%s %s %s %s', 'delimiter', '\t');
+GO_annot_manual_human_all=[GO_gene_symbol_all GO_term_id_all];
+GO_annot_manual_human_all=uniqueRowsCA(GO_annot_manual_human_all);
+save HPO2GO_Files/HPOprop2GOall_HPO_test_GO_annotation_all.mat GO_annot_manual_human_all -v7
+GO_annot_manual_human_all_addcol=[GO_gene_symbol_all GO_term_id_all GO_term_evid_all];
+GO_annot_manual_human_all_addcol=uniqueRowsCA(GO_annot_manual_human_all_addcol);
+save HPO2GO_Files/HPOprop2GOall_HPO_test_GO_annotation_all_addcol.mat GO_annot_manual_human_all_addcol -v7
+
+benchmark_hpo=pfp_loaditem('CAFA2/CAFA2-master/benchmark/lists/hpo_HUMAN_type1.txt', 'char');
+[Lia,Locb]=ismember(CAFA2_Targets_human_all_mappings(:,1),benchmark_hpo);
+CAFA2_Targets_human_all_mappings_CAFA2hpobench=CAFA2_Targets_human_all_mappings(Lia==1,:);
+save HPO2GO_Files/HPOprop2GOall_CAFA2_Targets_human_all_mappings_CAFA2hpobench.mat CAFA2_Targets_human_all_mappings_CAFA2hpobench -v7
+[Lia,Locb]=ismember(GO_annot_manual_human_all(:,1),CAFA2_Targets_human_all_mappings_CAFA2hpobench(:,4));
+GO_annot_manual_human_all_CAFA2hpobench=GO_annot_manual_human_all(Lia==1,:);
+save HPO2GO_Files/HPOprop2GOall_HPO_test_GO_annotation_all_CAFA2hpobench.mat GO_annot_manual_human_all_CAFA2hpobench -v7
+
+[HPOprop_UniProt_id,HPOprop_ID,HPOprop_gene_symbol]=textread('CAFA2_HPO_training_propagated.txt', '%s %s %s', 'delimiter', '\t');
+HPOprop_gene_annotation=[HPOprop_UniProt_id HPOprop_gene_symbol HPOprop_ID];
+HPOprop_gene_annotation=uniqueRowsCA(HPOprop_gene_annotation);
+save HPO2GO_Files/HPOprop2GOall_HPOprop_test_HPOprop_gene_annotation.mat HPOprop_gene_annotation -v7
+HPOprop_gene_symbol_unique=unique(HPOprop_gene_annotation(:,2));
+
+
+% Selecting the GO annotations for the HPOprop annotated protein list:
+
+
+[Lia,Locb]=ismember(GO_annot_manual_human_all(:,1),HPOprop_gene_symbol_unique);
+GO_annot_manual_human=GO_annot_manual_human_all(Lia==1,:);
+save HPO2GO_Files/HPOprop2GOall_HPOprop_test_GO_annotation.mat GO_annot_manual_human -v7
+
+% Generating the HPOprop and GO term pairs:
+
+to=0;
+HPOprop_GO_mapping_ind=zeros(10000000,2);
+for i=1:length(HPOprop_gene_symbol_unique);
+    disp(['Mapping HPOprop terms with GO terms with gene #: ', num2str(i), ' / ', num2str(length(HPOprop_gene_symbol_unique))])
+    [Lia,Locb]=ismember(HPOprop_gene_annotation(:,2),HPOprop_gene_symbol_unique(i,1));
+    [Lia2,Locb2]=ismember(GO_annot_manual_human(:,1),HPOprop_gene_symbol_unique(i,1));
+    if sum(Lia2)>0
+        siz=sum(Lia)*sum(Lia2);
+        [A,B]=meshgrid(find(Lia==1),find(Lia2==1));
+        c=cat(2,A',B');
+        d=reshape(c,[],2);
+        HPOprop_GO_mapping_ind(to+1:to+siz,:)=d;
+        to=to+siz;
+    end
+end
+HPOprop_GO_mapping_ind(HPOprop_GO_mapping_ind(:,1)==0,:)=[];
+HPOprop_GO_mapping_terms=HPOprop_gene_annotation(HPOprop_GO_mapping_ind(:,1),3);
+HPOprop_GO_mapping_terms(:,2)=GO_annot_manual_human(HPOprop_GO_mapping_ind(:,2),2);
+save HPO2GO_Files/HPOprop2GOall_HPOprop_GO_mapping_terms.mat HPOprop_GO_mapping_terms -v7
+
+
+% Calculating the co-occurrence similarity between ontology terms:
+
+[HPOprop_GO_mapping_terms_unique,I,J]=uniqueRowsCA(HPOprop_GO_mapping_terms);
+HPOprop_GO_mapping_terms_freq=sort(J);
+HPOprop_GO_mapping_terms_pair_hist=hist(HPOprop_GO_mapping_terms_freq,0.5:1:max(HPOprop_GO_mapping_terms_freq)+0.5);
+HPOprop_GO_mapping_terms_pair_hist=HPOprop_GO_mapping_terms_pair_hist(1,1:end-1)';
+save HPO2GO_Files/HPOprop2GOall_HPOprop_GO_mapping_terms_unique.mat HPOprop_GO_mapping_terms_unique -v7
+save HPO2GO_Files/HPOprop2GOall_HPOprop_GO_mapping_terms_pair_hist.mat HPOprop_GO_mapping_terms_pair_hist -v7
+
+[HPOprop_terms_unique,~,N]=unique(HPOprop_gene_annotation(:,3));
+HPOprop_terms_annot_hist=hist(N,0.5:1:max(N)+0.5);
+HPOprop_terms_annot_hist=HPOprop_terms_annot_hist(1,1:end-1)';
+save HPO2GO_Files/HPOprop2GOall_HPOprop_terms_unique.mat HPOprop_terms_unique -v7
+save HPO2GO_Files/HPOprop2GOall_HPOprop_terms_annot_hist.mat HPOprop_terms_annot_hist -v7
+
+[GO_terms_unique,~,N]=unique(GO_annot_manual_human(:,2));
+GO_terms_annot_hist=hist(N,0.5:1:max(N)+0.5);
+GO_terms_annot_hist=GO_terms_annot_hist(1,1:end-1)';
+save HPO2GO_Files/HPOprop2GOall_GO_terms_unique.mat GO_terms_unique -v7
+save HPO2GO_Files/HPOprop2GOall_GO_terms_annot_hist.mat GO_terms_annot_hist -v7
+
+[~,HPOprop_GO_mapping_unique_array_ind]=ismember(HPOprop_GO_mapping_terms_unique(:,1),HPOprop_terms_unique);
+[~,HPOprop_GO_mapping_unique_array_ind(:,2)]=ismember(HPOprop_GO_mapping_terms_unique(:,2),GO_terms_unique);
+
+HPOprop_GO_mapping_sematic_sim_high_det=zeros(length(HPOprop_GO_mapping_terms_unique),5);
+for i=1:length(HPOprop_GO_mapping_terms_unique);
+    disp(['Calculating the semantic similarity between the HPOprop ang GO term pair #: ', num2str(i), ' / ', num2str(length(HPOprop_GO_mapping_terms_unique))])
+    t1=HPOprop_GO_mapping_terms_pair_hist(i,1);
+    t2=HPOprop_terms_annot_hist(HPOprop_GO_mapping_unique_array_ind(i,1),1);
+    t3=GO_terms_annot_hist(HPOprop_GO_mapping_unique_array_ind(i,2),1);
+    HPOprop_GO_mapping_sematic_sim_high_det(i,1:5)=[i (2*t1)/(t2+t3) t1 t2 t3]; % columns: indice of mapping, semantic similarity of the mapped terms, # of co-annotated genes, total # of annotation of the mapped HPOprop term on different genes, total # of annotation of the mapped GO term on different genes
+end
+save HPO2GO_Files/HPOprop2GOall_HPOprop_GO_mapping_sematic_sim_high_det.mat HPOprop_GO_mapping_sematic_sim_high_det -v7
+
+HPOprop_GO_Raw_Mapping_merged=[HPOprop_GO_mapping_terms_unique num2cell(HPOprop_GO_mapping_sematic_sim_high_det(:,2:end))];
+save HPO2GO_Files/HPOprop2GOall_HPOprop_GO_Raw_Mapping_merged.mat HPOprop_GO_Raw_Mapping_merged -v7
+HPOprop_GO_Raw_Mapping_merged_txt=HPOprop_GO_Raw_Mapping_merged';
+fid=fopen('HPO2GO_Files/HPOprop2GOall_HPOprop_GO_Raw_Mapping_merged.txt', 'w');
+fprintf(fid, '%s\t%s\t%.4f\t%d\t%d\t%d\n', HPOprop_GO_Raw_Mapping_merged_txt{:});
+fclose(fid);
+
+% (large-scale performance test with different parameters)
+
+load HPO2GO_Files/HPOprop2GOall_HPOprop_GO_mapping_sematic_sim_high_det.mat
+load HPO2GO_Files/HPOprop2GOall_HPOprop_GO_mapping_terms_unique.mat
+load HPO2GO_Files/HPO_test_GO_annotation_all_CAFA2hpobench.mat
+load CAFA2/CAFA2-master/ontology/HPO.mat
+load CAFA2/CAFA2-master/benchmark/groundtruth/hpoa.mat
+n_mat=[2 5 10 20 30 40 50 60 70 80 90 100 110 120 130 140 145 150 155 160 165 170 175 180 185 190 195 200 210 220 230 250 250 300 400 500];
+S_mat=0:0.01:1;
+
+for j=1:length(n_mat)
+    disp(['Analyzing the performance for n: ', num2str(j), ' / ', num2str(length(n_mat))])
+    load HPO2GO_Files/CAFA2_Targets_human_all_mappings.mat
+    n=n_mat(1,j);
+    S=0.05;
+    high_det_thres=HPOprop_GO_mapping_sematic_sim_high_det(HPOprop_GO_mapping_sematic_sim_high_det(:,2)>=S,:);
+    high_det_thres=high_det_thres(high_det_thres(:,3)>=n,:);
+    HPOprop2GOall_Mapping=HPOprop_GO_mapping_terms_unique(high_det_thres(:,1),:);
+    HPOprop2GOall_Mapping(:,3:4)=num2cell(HPOprop_GO_mapping_sematic_sim_high_det(high_det_thres(:,1),2:3));  
+    mapGO_unique=unique(HPOprop2GOall_Mapping(:,2));
+    [~,Locb0]=ismember(HPOprop2GOall_Mapping(:,2),mapGO_unique);
+    [Lia,Locb]=ismember(GO_annot_manual_human_all_CAFA2hpobench(:,2),mapGO_unique);
+    to=0;
+    CAFA2_HPOprop_predictions=cell(15000000,3);
+    for i=1:length(mapGO_unique)
+        disp(['Predicting HPO terms for the mapped GO term #: ', num2str(i), ' / ', num2str(length(mapGO_unique))])
+        genesymbol_temp=GO_annot_manual_human_all_CAFA2hpobench(Locb==i,1);
+        HPOprop_temp=HPOprop2GOall_Mapping(Locb0==i,1);
+        score_temp=HPOprop2GOall_Mapping(Locb0==i,3);
+        if sum(Lia)>0
+            siz=length(genesymbol_temp)*length(HPOprop_temp);
+            [A,B]=meshgrid(1:length(genesymbol_temp),1:length(HPOprop_temp));
+            c=cat(2,A',B');
+            d=reshape(c,[],2);
+            CAFA2_HPOprop_predictions(to+1:to+siz,1)=genesymbol_temp(d(:,1),1);
+            CAFA2_HPOprop_predictions(to+1:to+siz,2)=HPOprop_temp(d(:,2),1);
+            CAFA2_HPOprop_predictions(to+1:to+siz,3)=score_temp(d(:,2),1);
+            to=to+siz;
+        end
+    end
+    CAFA2_HPOprop_predictions(cellfun(@isempty,CAFA2_HPOprop_predictions(:,1))==1,:)=[];
+    [CAFA2_HPOprop_predictions_un,I,C]=uniqueRowsCA(CAFA2_HPOprop_predictions(:,1:2));
+    score=cell2mat(CAFA2_HPOprop_predictions(:,3));
+    score_unique=splitapply(@max,score,C);  % Alternative 3) Very fast but requires Matlab 2017b
+    CAFA2_HPOprop_predictions_un(:,3)=num2cell(score_unique);
+    CAFA2_HPOprop_predictions=CAFA2_HPOprop_predictions_un;
+    CAFA2_HPOprop_predictions(ismember(CAFA2_HPOprop_predictions(:,1),'2xchrna4-3xchrnb2_human')==1,1)=cellstr('CHRNA4');
+    CAFA2_HPOprop_predictions(ismember(CAFA2_HPOprop_predictions(:,1),'3xchrna4-2xchrnb2_human')==1,1)=cellstr('CHRNA4');
+    mapsymbol_unique=unique(CAFA2_HPOprop_predictions(:,1));
+    [Lia0,Locb0]=ismember(CAFA2_HPOprop_predictions(:,1),mapsymbol_unique);
+    [Lia,Locb]=ismember(mapsymbol_unique,CAFA2_Targets_human_all_mappings(:,4));
+    Locb(Locb==0,1)=length(CAFA2_Targets_human_all_mappings)+1;
+    CAFA2_Targets_human_all_mappings(end+1,:)=cellstr(' ');
+    mapCAFAid_unique=CAFA2_Targets_human_all_mappings(Locb,1);
+    CAFA2_HPOprop_predictions_CAFAid_genesymbol_HPOpropid_sco=mapCAFAid_unique(Locb0,1);
+    CAFA2_HPOprop_predictions_CAFAid_genesymbol_HPOpropid_sco(:,2:4)=CAFA2_HPOprop_predictions;
+    CAFA2_pred_eval_save=CAFA2_HPOprop_predictions_CAFAid_genesymbol_HPOpropid_sco;
+    CAFA2_pred_eval_save(cellfun(@isempty,CAFA2_pred_eval_save(:,1))==1,:)=[];
+    CAFA2_HPOprop_target_predictions=CAFA2_pred_eval_save(:,[1 3 4]);
+    ind_greaterone=cell2mat(CAFA2_HPOprop_target_predictions(:,3))>1;
+    CAFA2_HPOprop_target_predictions(ind_greaterone,3)=num2cell(1.0000);
+    clear CAFA2_Targets_human_all_mappings
+    
+    CAFA2_HPOprop_target_predictions_txt=CAFA2_HPOprop_target_predictions';
+    fid=fopen('HPO2GO_Files/CAFA2_HPOprop_target_predictions_test.txt', 'w');
+    fprintf(fid, '%s\t%s\t%.4f\n', CAFA2_HPOprop_target_predictions_txt{:});
+    fclose(fid);
+    
+    pred=cafa_import('HPO2GO_Files/CAFA2_HPOprop_target_predictions_test.txt', HPO, false);
+    benchmark_hpo=pfp_loaditem('CAFA2/CAFA2-master/benchmark/lists/hpo_HUMAN_type1.txt', 'char');
+    fmax_hpo = pfp_seqmetric(benchmark_hpo, pred, oa, 'fmax');
+    wfmax_hpo = pfp_seqmetric(benchmark_hpo, pred, oa, 'wfmax', 'w', eia);
+    smin_hpo = pfp_seqmetric(benchmark_hpo, pred, oa, 'smin', 'w', eia);
+    nsmin_hpo = pfp_seqmetric(benchmark_hpo, pred, oa, 'nsmin', 'w', eia);
+    pr_hpo = pfp_seqmetric(benchmark_hpo, pred, oa, 'pr');
+    wpr_hpo = pfp_seqmetric(benchmark_hpo, pred, oa, 'wpr', 'w', eia);
+    fmax_hpo_all=(2*pr_hpo(:,1).*pr_hpo(:,2))./(pr_hpo(:,1)+pr_hpo(:,2));
+    ev_hpo = cafa_eval_term_auc('HPOprop2GO', benchmark_hpo, pred, oa,'full');
+    auc_hpo=mean(ev_hpo.auc(isnan(ev_hpo.auc)==0));
+    benchmark=pfp_loaditem('CAFA2/CAFA2-master/benchmark/groundtruth/propagated_hpo.txt', 'char');
+    benchmark_fix=benchmark(1:2:(end-1),1);
+    benchmark_fix_uni=unique(benchmark_fix);
+    fmax_limitedknow_benchmark = pfp_seqmetric(benchmark_fix_uni, pred, oa, 'fmax');
+    perf_HPOprop2GOall(j,1)=n_mat(1,j);
+    perf_HPOprop2GOall(j,2)=fmax_hpo;
+    perf_HPOprop2GOall(j,3)=wfmax_hpo;
+    perf_HPOprop2GOall(j,4)=smin_hpo;
+    perf_HPOprop2GOall(j,5)=nsmin_hpo;
+    perf_HPOprop2GOall(j,6)=auc_hpo;
+    indthres=find(fmax_hpo_all==max(fmax_hpo_all));
+    perf_HPOprop2GOall(j,7)=S_mat(max(indthres));
+end
+save HPO2GO_Files/perf_HPOprop2GOall.mat perf_HPOprop2GOall -v7
+
+% (the thresholds n=170 and S=0.11 provided the best performance)
+
+
+n=170;
+S=0.11;
+
+high_det_thres=HPOprop_GO_mapping_sematic_sim_high_det(HPOprop_GO_mapping_sematic_sim_high_det(:,2)>=S,:);
+high_det_thres=high_det_thres(high_det_thres(:,3)>=n,:);
+HPOprop2GOall_Finalized_Mapping=HPOprop_GO_mapping_terms_unique(high_det_thres(:,1),:);
+HPOprop2GOall_Finalized_Mapping(:,3:4)=num2cell(HPOprop_GO_mapping_sematic_sim_high_det(high_det_thres(:,1),2:3));
+
+save HPO2GO_Files/HPOprop2GOall_Finalized_Mapping.mat HPOprop2GOall_Finalized_Mapping -v7
+length(unique(HPOprop2GOall_Finalized_Mapping(:,1)))
+length(unique(HPOprop2GOall_Finalized_Mapping(:,2)))
+
+mapGO_unique=unique(HPOprop2GOall_Finalized_Mapping(:,2));
+[~,Locb0]=ismember(HPOprop2GOall_Finalized_Mapping(:,2),mapGO_unique);
+[Lia,Locb]=ismember(GO_annot_manual_human_all_CAFA2hpobench(:,2),mapGO_unique);
+to=0;
+CAFA2_HPOprop_predictions=cell(15000000,3);
+for i=1:length(mapGO_unique);
+    disp(['Predicting HPOprop terms for the mapped GO term #: ', num2str(i), ' / ', num2str(length(mapGO_unique))])
+    genesymbol_temp=GO_annot_manual_human_all_CAFA2hpobench(Locb==i,1);
+    HPOprop_temp=HPOprop2GOall_Finalized_Mapping(Locb0==i,1);
+    score_temp=HPOprop2GOall_Finalized_Mapping(Locb0==i,3);
+    if sum(Lia)>0
+        siz=length(genesymbol_temp)*length(HPOprop_temp);
+        [A,B]=meshgrid(1:length(genesymbol_temp),1:length(HPOprop_temp));
+        c=cat(2,A',B');
+        d=reshape(c,[],2);
+        CAFA2_HPOprop_predictions(to+1:to+siz,1)=genesymbol_temp(d(:,1),1);
+        CAFA2_HPOprop_predictions(to+1:to+siz,2)=HPOprop_temp(d(:,2),1);
+        CAFA2_HPOprop_predictions(to+1:to+siz,3)=score_temp(d(:,2),1);
+        to=to+siz;
+    end
+end
+CAFA2_HPOprop_predictions(cellfun(@isempty,CAFA2_HPOprop_predictions(:,1))==1,:)=[];
+[CAFA2_HPOprop_predictions_un,I,C]=uniqueRowsCA(CAFA2_HPOprop_predictions(:,1:2));
+score=cell2mat(CAFA2_HPOprop_predictions(:,3));
+score_unique=splitapply(@max,score,C);  % Alternative 3) Very fast but requires Matlab 2017b
+CAFA2_HPOprop_predictions_un(:,3)=num2cell(score_unique);
+CAFA2_HPOprop_predictions=CAFA2_HPOprop_predictions_un;
+CAFA2_HPOprop_predictions(ismember(CAFA2_HPOprop_predictions(:,1),'2xchrna4-3xchrnb2_human')==1,1)=cellstr('CHRNA4');
+CAFA2_HPOprop_predictions(ismember(CAFA2_HPOprop_predictions(:,1),'3xchrna4-2xchrnb2_human')==1,1)=cellstr('CHRNA4');
+
+
+mapsymbol_unique=unique(CAFA2_HPOprop_predictions(:,1));
+[Lia0,Locb0]=ismember(CAFA2_HPOprop_predictions(:,1),mapsymbol_unique);
+[Lia,Locb]=ismember(mapsymbol_unique,CAFA2_Targets_human_all_mappings(:,4));
+Locb(Locb==0,1)=length(CAFA2_Targets_human_all_mappings)+1;
+CAFA2_Targets_human_all_mappings(end+1,:)=cellstr(' ');
+mapCAFAid_unique=CAFA2_Targets_human_all_mappings(Locb,1);
+CAFA2_HPOprop_predictions_CAFAid_genesymbol_HPOpropid_sco=mapCAFAid_unique(Locb0,1);
+CAFA2_HPOprop_predictions_CAFAid_genesymbol_HPOpropid_sco(:,2:4)=CAFA2_HPOprop_predictions;
+%save HPO2GO_Files/HPOprop2GOall_CAFA2_HPOprop_predictions_CAFAid_genesymbol_HPOpropid_sco.mat CAFA2_HPOprop_predictions_CAFAid_genesymbol_HPOpropid_sco -v7
+CAFA2_pred_eval_save=CAFA2_HPOprop_predictions_CAFAid_genesymbol_HPOpropid_sco;
+CAFA2_pred_eval_save(cellfun(@isempty,CAFA2_pred_eval_save(:,1))==1,:)=[];
+CAFA2_HPOprop_target_predictions=CAFA2_pred_eval_save(:,[1 3 4]);
+ind_greaterone=find(cell2mat(CAFA2_HPOprop_target_predictions(:,3))>1);
+CAFA2_HPOprop_target_predictions(ind_greaterone,3)=num2cell(1.0000);
+%save HPO2GO_Files/HPOprop2GOall_CAFA2_HPOprop_target_predictions.mat CAFA2_HPOprop_target_predictions
+
+CAFA2_HPOprop_target_predictions_txt=CAFA2_HPOprop_target_predictions';
+fid=fopen('HPO2GO_Files/CAFA2_HPO_benchmark_predictions_HPOprop2GOall.txt', 'w');
+fprintf(fid, '%s\t%s\t%.4f\n', CAFA2_HPOprop_target_predictions_txt{:});
+fclose(fid);
+
 
 % Calculating performance measures using CAFA scripts (CAFA scripts and datasets were downloaded from CAFA2 repository):
 
 load CAFA2/CAFA2-master/ontology/HPO.mat
 load CAFA2/CAFA2-master/benchmark/groundtruth/hpoa.mat
-benchmark=pfp_loaditem('CAFA2/CAFA2-master/benchmark/groundtruth/propagated_HPO.txt', 'char');
-ont=pfp_ontbuild('CAFA2/CAFA2-master/ontology/hpo_v810-17-SEP-2013.obo');
-pred=cafa_import('HPO2GO_Files/CAFA2_HPO_target_predictions.txt', HPO, false);
-fmax = pfp_seqmetric(benchmark, pred, oa, 'fmax');
-wfmax = pfp_seqmetric(benchmark, pred, oa, 'wfmax', 'w', eia);
-nsmin = pfp_seqmetric(benchmark, pred, oa, 'nsmin', 'w', eia);
-pr = pfp_seqmetric(benchmark, pred, oa, 'pr');
-rm = pfp_seqmetric(benchmark, pred, oa, 'rm', 'w', eia);
-nrm = pfp_seqmetric(benchmark, pred, oa, 'nrm', 'w', eia);
-cm = pfp_termcm(benchmark, pred, oa, 'full');
-ev = cafa_eval_term_auc('HPO2GO', benchmark, pred, oa,'full');
-aucs{1,1}=ev;
-cafa_plot_term_avgauc('HPO2GO_Files/HPO2GO_term_centric_Avg_AUC.png', 'CAFA2 HPO Term Centric Avg. AUC', aucs, ont);
-save HPO2GO_Files/HPO2GO_CAFA2_perf_results.mat fmax wfmax smin nsmin pr rm nrm cm ev aucs -v7
+benchmark=pfp_loaditem('CAFA2/CAFA2-master/benchmark/lists/hpo_HUMAN_type1.txt', 'char');
+pred=cafa_import('HPO2GO_Files/CAFA2_HPO_benchmark_predictions_HPOprop2GOall.txt', HPO, false);
+pred2=cafa_import('HPO2GO_Files/CAFA2_HPO_target_predictions_n1.txt', HPO, false);
+fmax=pfp_seqmetric(benchmark, pred, oa, 'fmax');
+wfmax=pfp_seqmetric(benchmark, pred, oa, 'wfmax', 'w', eia);
+smin=pfp_seqmetric(benchmark, pred, oa, 'smin', 'w', eia);
+pr=pfp_seqmetric(benchmark, pred, oa, 'pr');
+fmax_all=(2*pr(:,1).*pr(:,2))./(pr(:,1)+pr(:,2));
+wpr=pfp_seqmetric(benchmark, pred, oa, 'wpr', 'w', eia);
+wfmax_all=(2*wpr(:,1).*wpr(:,2))./(wpr(:,1)+wpr(:,2));
+rm=pfp_seqmetric(benchmark, pred, oa, 'rm', 'w', eia);
+cm=pfp_termcm(benchmark, pred, oa, 'full');
+ev=cafa_eval_term_auc('HPO2GO', benchmark, pred2, oa,'full');
+auc_mean=mean(ev.auc(isnan(ev.auc)==0));
+save HPO2GO_Files/HPO2GO_CAFA2_perf_results.mat pred benchmark oa eia pred2 fmax wfmax smin pr rm cm ev auc_mean -v7
 
-% (fmax=0.402, wfmax=0.319, nsmin=0.60)
+% (fmax=0.35, wfmax=0.29, smin=57.2 auc_mean=0.59)
 
 
-% Plotting the precision - recall curve for HPO2GO CAFA2 prediction test results:
+% Plotting the weighted precision - recall curve for HPO2GO CAFA2 prediction test results:
 
-thres=0:0.01:0.69;
+thres=0:0.01:0.58;
 figure;
 hold on;
-F=plot(pr(1:70,2),pr(1:70,1));
+F=plot(wpr(1:59,2),wpr(1:59,1));
 set(F,'Color',[0 0 0],'LineWidth',4)
 x_lab=xlabel('Recall');
 y_lab=ylabel('Precision');
@@ -832,20 +1149,11 @@ title('Precision-recall Curve for CAFA2 HPO Prediction','FontSize',16);
 %grid on
 axis([0 1 0 1])
 hold off;
+S_mat=0:0.01:1;
+indthres=find(wfmax_all==max(wfmax_all));
+max_perf_thres=S_mat(max(indthres));
 
-% Plotting the remaining uncertainty - misinformation curve (normalized Smin) for HPO2GO CAFA2 prediction test results:
 
-figure;
-hold on;
-F=plot(nrm(:,2),nrm(:,1));
-set(F,'Color',[0 0 0],'LineWidth',4)
-x_lab=xlabel('Remaining uncertinity');
-y_lab=ylabel('Misinformation');
-set(x_lab,'FontSize',14);
-set(y_lab,'FontSize',14);
-title('Normalized Remaining Uncertainty - Misinformation Curve for CAFA2 HPO Prediction','FontSize',16);
-%grid on
-axis([0 1 0 1])
-hold off;
+
 
 
