@@ -2,6 +2,12 @@
 
 Mapping between Human Phenotype Ontology (HPO) and Gene Ontology (GO) terms for the prediction of gene/protein - function - phenotype - disease associations.
 
+## Citation
+
+If you find HPO2GO useful, please consider citing this publication:
+
+Doğan, T. (2018). HPO2GO: Prediction of Human Phenotype Ontology Term Associations Using Cross Ontology Annotation Co-occurrences. PeerJ 6:e5298.
+
 ## Title, Author Info and Abstract
 
 HPO2GO: Prediction of Human Phenotype Ontology Term Associations Using Cross Ontology Annotation Co-occurrences
