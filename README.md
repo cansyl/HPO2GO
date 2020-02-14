@@ -1,4 +1,4 @@
-## HPO2GO v1.0
+## HPO2GO v1.1
 
 Mapping between Human Phenotype Ontology (HPO) and Gene Ontology (GO) terms for the prediction of gene/protein - function - phenotype - disease associations.
 
