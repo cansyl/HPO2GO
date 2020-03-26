@@ -607,7 +607,9 @@ length(list)-length(CAFA3_HPO_disease_annot_sort);
 
 % Performance test on CAFA2 targets
 
-[CAFA2_HPO_ground_geneCAFAid,CAFA2_HPO_ground_HPOid]=textread('CAFA2/CAFA2-master/benchmarS/groundtruth/propagated_HPO.txt', '%s %s', 'delimiter', '\t');
+% (download CAFA2 files from: https://figshare.com/articles/Supplementary_Data_for_CAFA2/2059944)
+
+[CAFA2_HPO_ground_geneCAFAid,CAFA2_HPO_ground_HPOid]=textread('CCAFA2/CAFA2-master/benchmark/groundtruth/propagated_HPO.txt', '%s %s', 'delimiter', '\t');
 CAFA2_HPO_ground_geneCAFAid_unique=unique(CAFA2_HPO_ground_geneCAFAid);
 
 [CAFA2_Targets_human_headers,~]=fastaread('CAFA2/CAFA2_Supplementary_data/data/CAFA2-targets/eukarya/sp_species.9606.tfa');
@@ -841,7 +843,7 @@ CAFA2_HPO_training_propagated=vertcat(CAFA2_HPO_training_prop,CAFA2_HPO_training
 CAFA2_HPO_training_propagated=uniqueRowsCA(CAFA2_HPO_training_propagated);
 CAFA2_HPO_training_propagated_unique=unique(CAFA2_HPO_training_propagated(:,1));
 % (download the uniprot acc, entry name, gene symbol for the proteins in 'CAFA2_HPO_training_propagated_unique' as gene_list.txt)
-[CAFA2_HPO_training_propagated_unique_UniProtID,CAFA2_HPO_training_propagated_unique_entry_name,CAFA2_HPO_training_propagated_unique_genesymbol]=textread('gene_list.txt', '%s %s %s', 'delimiter', '\t', 'headerlines', 1);
+[CAFA2_HPO_training_propagated_unique_UniProtID,CAFA2_HPO_training_propagated_unique_entry_name,CAFA2_HPO_training_propagated_unique_genesymbol]=textread('HPO2GO_Files/gene_list.txt', '%s %s %s', 'delimiter', '\t', 'headerlines', 1);
 [Lia,Locb]=ismember(CAFA2_HPO_training_propagated(:,1),CAFA2_HPO_training_propagated_unique_UniProtID);
 CAFA2_HPO_training_propagated=CAFA2_HPO_training_propagated(Lia==1,:);
 CAFA2_HPO_training_propagated(:,3)=CAFA2_HPO_training_propagated_unique_genesymbol(Locb(Lia==1,1),1);
