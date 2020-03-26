@@ -597,7 +597,7 @@ fclose(fid);
 list=unique(HPO2protein_predictions(:,1));
 dlmcell('hpo_list.txt',list)
 % (load the list to UniProt ID mapping and obtain the disease annotation file)
-[CAFA3_HPO_UniProt_acc,CAFA3_HPO_gene_name,CAFA3_HPO_disease_annot,CAFA3_HPO_orphanet_annot]=textread('CAFA3_HPO_predicted_target_list_w_disease_annot.tab', '%s %s %s %s', 'delimiter', '\t', 'headerlines', 1, 'bufsize', 10000);
+[CAFA3_HPO_UniProt_acc,CAFA3_HPO_gene_name,CAFA3_HPO_disease_annot,CAFA3_HPO_orphanet_annot]=textread('HPO2GO_Files/CAFA3_HPO_predicted_target_list_w_disease_annot.tab', '%s %s %s %s', 'delimiter', '\t', 'headerlines', 1, 'bufsize', 10000);
 CAFA3_HPO_disease_annot_sort=sort(CAFA3_HPO_disease_annot);
 CAFA3_HPO_disease_annot_sort(cellfun(@isempty,CAFA3_HPO_disease_annot_sort(:,1))==1,:)=[];
 length(list)-length(CAFA3_HPO_disease_annot_sort);
@@ -875,7 +875,7 @@ save HPO2GO_Files/HPOprop2GOall_CAFA2_Targets_human_all_mappings_CAFA2hpobench.m
 GO_annot_manual_human_all_CAFA2hpobench=GO_annot_manual_human_all(Lia==1,:);
 save HPO2GO_Files/HPOprop2GOall_HPO_test_GO_annotation_all_CAFA2hpobench.mat GO_annot_manual_human_all_CAFA2hpobench -v7
 
-[HPOprop_UniProt_id,HPOprop_ID,HPOprop_gene_symbol]=textread('CAFA2_HPO_training_propagated.txt', '%s %s %s', 'delimiter', '\t');
+[HPOprop_UniProt_id,HPOprop_ID,HPOprop_gene_symbol]=textread('HPO2GO_Files/CAFA2_HPO_training_propagated.txt', '%s %s %s', 'delimiter', '\t');
 HPOprop_gene_annotation=[HPOprop_UniProt_id HPOprop_gene_symbol HPOprop_ID];
 HPOprop_gene_annotation=uniqueRowsCA(HPOprop_gene_annotation);
 save HPO2GO_Files/HPOprop2GOall_HPOprop_test_HPOprop_gene_annotation.mat HPOprop_gene_annotation -v7
