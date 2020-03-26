@@ -361,7 +361,7 @@ for j=1:5;
         S=S+0.1;
         dist1=HPO_GO_mapping_sematic_sim_high_det(HPO_GO_mapping_sematic_sim_high_det(:,2)>=S,:);
         dist1=sort(dist1(dist1(:,3)>=n,2));
-        dist2=HPO_GO_mapping_sematic_sim_high_det_rand_norm(HPO_GO_mapping_sematic_sim_high_det_rand_norm(:,2)>=S,:);
+        dist2=HPO_GO_mapping_sematic_sim_high_det_rand(HPO_GO_mapping_sematic_sim_high_det_rand(:,2)>=S,:);
         dist2=sort(dist2(dist2(:,3)>=n,2));
         
         dist1_hist=hist(dist1,20);
