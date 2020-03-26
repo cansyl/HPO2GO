@@ -170,6 +170,7 @@ fclose(fid);
 
 % Extracting the statistics for the original mapping - part of Table 1:
 
+HPO_GO_mapping_sematic_sim=HPO_GO_mapping_sematic_sim_high_det(:,2);
 S=1.1;
 Mapping_stat=0;
 for i=1:10;
@@ -276,6 +277,7 @@ fclose(fid);
 
 % Extracting the statistics for the randomized mapping - part of Table 1:
 
+HPO_GO_mapping_sematic_sim_rand=HPO_GO_mapping_sematic_sim_high_det_rand(:,2);
 S=1.1;
 Mapping_stat_rand=0;
 for i=1:10;
